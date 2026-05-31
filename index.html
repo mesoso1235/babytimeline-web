@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>パパノート — 父親向け妊娠伴走アプリ（妊娠生活OS）</title>
+  <meta name="description" content="初めて父親になる男性へ。ママの体調、今やるべきタスク、食べていいものダメなものが一瞬でわかる、妊娠生活の羅針盤アプリ。" />
+  <meta name="theme-color" content="#12100E" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════
+       SCREEN 0: SETUP (出産予定日入力画面)
+  ══════════════════════════════════ -->
+  <div id="screen-setup" class="screen active">
+    <div class="setup-orb orb1"></div>
+    <div class="setup-orb orb2"></div>
+    <div class="setup-wrap">
+      <header class="setup-top">
+        <span class="setup-emoji" role="img" aria-label="赤ちゃん">👶</span>
+        <h1 class="setup-h1">パパノート</h1>
+        <p class="setup-desc">初めて父親になるあなたへ。<br>妊娠生活を支える伴走アプリ</p>
+      </header>
+
+      <main class="setup-form glass">
+        <p class="setup-form-label">まず、お子さんの予定日を教えてください</p>
+        <div class="setup-tabs" role="tablist">
+          <button class="stab active" id="tab-future" onclick="setMode('future')" role="tab" aria-selected="true">🗓 出産予定日</button>
+          <button class="stab" id="tab-past" onclick="setMode('past')" role="tab" aria-selected="false">🎂 誕生日</button>
+        </div>
+        
+        <div class="input-group">
+          <label class="field-label" id="field-label" for="date-input">出産予定日</label>
+          <input type="date" id="date-input" class="date-field" />
+        </div>
+
+        <button class="cta-btn" onclick="saveAndStart()" id="btn-setup-submit">
+          はじめる
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </main>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MAIN APP (5-tab SPA)
+  ══════════════════════════════════ -->
+  <div id="app" class="app-wrap hidden">
+
+    <!-- ── SCREEN 1: HOME (ホーム) ── -->
+    <section id="screen-home" class="tab-screen active-tab" aria-label="ホーム">
+      <header class="top-bar">
+        <h1 class="top-bar-title">パパノート</h1>
+        <button class="icon-btn" onclick="resetApp()" id="btn-reset-settings" aria-label="設定リセット">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </header>
+
+      <main class="scroll-area">
+        <!-- 進捗ダッシュボード -->
+        <div class="progress-hero">
+          <div class="progress-ring-wrap">
+            <svg class="progress-ring" width="100" height="100" viewBox="0 0 100 100">
+              <circle class="ring-bg" cx="50" cy="50" r="42" />
+              <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="42" />
+            </svg>
+            <div class="ring-inner">
+              <div class="ring-pct" id="ring-pct">0%</div>
+              <div class="ring-label">進捗</div>
+            </div>
+          </div>
+          <div class="hero-info">
+            <div class="hero-badge" id="hero-badge">計算中</div>
+            <div class="hero-week" id="hero-week">--週--日</div>
+            <div class="hero-sub" id="hero-sub">予定日まであと--日</div>
+          </div>
+        </div>
+
+        <!-- 今日のママの様子 -->
+        <h2 class="section-hd">🤰 今日のママ</h2>
+        <div class="voice-card glass accent-mom" id="home-mama-card" onclick="switchTab('mom')">
+          <div class="voice-title" id="home-mama-title">読み込み中...</div>
+          <p class="voice-text" id="home-mama-text">ママの今週のからだの変化について表示します。</p>
+          <div class="voice-more">ママ画面で詳しく見る →</div>
+        </div>
+
+        <!-- 今日のパパミッション -->
+        <h2 class="section-hd">🏃 今日のパパミッション</h2>
+        <div class="mission-card glass" id="home-mission-card">
+          <div class="mission-check-row">
+            <div class="mission-check" id="home-mission-check">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="mission-text" id="home-mission-text">読み込み中...</div>
+          </div>
+          <div class="mission-note">タップで完了 / パパ画面で他のタスクも確認 →</div>
+        </div>
+
+        <!-- 今日の声掛け -->
+        <h2 class="section-hd">💬 今日の声掛け</h2>
+        <div class="voice-card glass-warm">
+          <p class="voice-text" id="home-voice-text">読み込み中...</p>
+          <div class="voice-note">「どうすればいい？」より「そうか、辛かったね」と共感してみましょう。</div>
+        </div>
+
+        <div class="footer-pad"></div>
+      </main>
+    </section>
+
+    <!-- ── SCREEN 2: SEARCH (検索) ── -->
+    <section id="screen-search" class="tab-screen" aria-label="検索">
+      <header class="top-bar">
+        <h1 class="top-bar-title">🔍 安全検索</h1>
+      </header>
+
+      <main class="scroll-area">
+        <!-- 検索バー -->
+        <div class="search-bar-wrap">
+          <input type="search" id="search-input" class="search-input" placeholder="食べ物、行動、薬、症状などを検索..." aria-label="検索ワード" />
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+
+        <!-- カテゴリ選択チップ -->
+        <div class="category-chips-wrap" role="tablist">
+          <button class="chip active" id="chip-all" onclick="selectSearchCategory('all')" role="tab" aria-selected="true">すべて</button>
+          <button class="chip" id="chip-food" onclick="selectSearchCategory('food')" role="tab" aria-selected="false">🍏 食材</button>
+          <button class="chip" id="chip-activity" onclick="selectSearchCategory('activity')" role="tab" aria-selected="false">🏃 行動</button>
+          <button class="chip" id="chip-medicine" onclick="selectSearchCategory('medicine')" role="tab" aria-selected="false">💊 薬</button>
+          <button class="chip" id="chip-symptom" onclick="selectSearchCategory('symptom')" role="tab" aria-selected="false">🤒 症状</button>
+        </div>
+
+        <!-- 検索結果リスト -->
+        <div class="search-results-list" id="search-results">
+          <!-- JSでレンダリングされます -->
+        </div>
+
+        <div class="footer-pad"></div>
+      </main>
+    </section>
+
+    <!-- ── SCREEN 3: MOM (ママ) ── -->
+    <section id="screen-mom" class="tab-screen" aria-label="ママ">
+      <header class="top-bar">
+        <h1 class="top-bar-title">🤰 ママの状態</h1>
+        <div class="period-chip" id="mom-period-chip">妊娠中</div>
+      </header>
+
+      <main class="scroll-area">
+        <!-- 週数スライダー -->
+        <div class="week-selector-card glass">
+          <div class="wsc-header">
+            <button class="wsc-btn" onclick="adjustBrowsingWeek(-1)" aria-label="前の週数へ">‹</button>
+            <span class="wsc-title" id="mom-week-title">妊娠 --週</span>
+            <button class="wsc-btn" onclick="adjustBrowsingWeek(1)" aria-label="次の週数へ">›</button>
+          </div>
+          <div class="wsc-slider-wrap">
+            <input type="range" id="mom-week-slider" min="4" max="42" value="7" class="week-range-slider" />
+            <div class="wsc-labels">
+              <span>初期</span>
+              <span>中期（安定期）</span>
+              <span>後期（正期産）</span>
+            </div>
+          </div>
+          <div class="wsc-indicator">
+            閲覧中の週数: <strong id="mom-week-value">7</strong> 週
+          </div>
+        </div>
+
+        <!-- ママのからだ情報コンテナ -->
+        <div id="mom-data-container">
+          <!-- JSで挿入されます -->
+        </div>
+
+        <div class="footer-pad"></div>
+      </main>
+    </section>
+
+    <!-- ── SCREEN 4: DAD (パパ) ── -->
+    <section id="screen-dad" class="tab-screen" aria-label="パパ">
+      <header class="top-bar">
+        <h1 class="top-bar-title">🏃 パパのやること</h1>
+        <div class="period-chip" id="dad-period-chip">今週</div>
+      </header>
+
+      <main class="scroll-area">
+        <div class="welcome-box">
+          <p class="wb-desc">妻のために「今日から実行できる」具体的な支援アクションです。完了したタスクはチェックを入れてみましょう。</p>
+        </div>
+
+        <!-- タスクリストコンテナ -->
+        <div class="dad-tasks-wrap" id="dad-tasks-list">
+          <!-- JSでレンダリングされます -->
+        </div>
+
+        <div class="footer-pad"></div>
+      </main>
+    </section>
+
+    <!-- ── SCREEN 5: LOG (パパログ) ── -->
+    <section id="screen-log" class="tab-screen" aria-label="ログ">
+      <header class="top-bar">
+        <h1 class="top-bar-title">📝 パパログ</h1>
+      </header>
+
+      <main class="scroll-area">
+        <!-- ログ入力フォーム -->
+        <div class="log-form-card glass">
+          <h2 class="log-form-title">今日の気づきを記録する</h2>
+          <form id="log-form">
+            <div class="input-group">
+              <label class="field-label-sm" for="log-date">日付</label>
+              <input type="date" id="log-date" class="date-field-sm" required />
+            </div>
+            
+            <div class="input-group">
+              <label class="field-label-sm" for="log-memo">メモ（心拍確認できた、つわりが辛そうだった、等）</label>
+              <textarea id="log-memo" class="memo-field" placeholder="今日あったことや感じたこと、次の検診で聞くことをメモ..." required></textarea>
+            </div>
+
+            <div class="log-form-actions">
+              <button type="button" id="log-edit-cancel" class="cancel-btn hidden">キャンセル</button>
+              <button type="submit" class="cta-btn">
+                記録する
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ログタイムラインリスト -->
+        <h2 class="section-hd">⌛ 過去のログ一覧</h2>
+        <div class="log-timeline-list" id="log-list">
+          <!-- JSでレンダリングされます -->
+        </div>
+
+        <div class="footer-pad"></div>
+      </main>
+    </section>
+
+    <!-- ── BOTTOM NAVIGATION (ボトムナビゲーション) ── -->
+    <nav class="bottom-nav" role="tablist">
+      <button class="nav-btn active" id="nav-home" onclick="switchTab('home')" role="tab" aria-selected="true" aria-label="ホーム">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>ホーム</span>
+      </button>
+      <button class="nav-btn" id="nav-search" onclick="switchTab('search')" role="tab" aria-selected="false" aria-label="安全検索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>安全検索</span>
+      </button>
+      <button class="nav-btn" id="nav-mom" onclick="switchTab('mom')" role="tab" aria-selected="false" aria-label="ママ">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>ママ</span>
+      </button>
+      <button class="nav-btn" id="nav-dad" onclick="switchTab('dad')" role="tab" aria-selected="false" aria-label="パパ">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>パパ</span>
+      </button>
+      <button class="nav-btn" id="nav-log" onclick="switchTab('log')" role="tab" aria-selected="false" aria-label="パパログ">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span>ログ</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Detail overlay (検索詳細モーダル) -->
+  <div id="detail-overlay" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="overlay-panel glass" id="overlay-panel">
+      <!-- JavaScriptで動的生成されます -->
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
